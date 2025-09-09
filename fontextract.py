@@ -6,7 +6,7 @@ import argparse
 
 # === FILE TYPE DEFINITIONS ===
 web_extensions = ('.woff', '.woff2', '.eot', '.svg')
-license_extensions = ('.txt',)
+license_extensions = ('.txt', ".pdf",)
 
 def safe_copy(src_path, dest_folder, check_existing=True, allow_overwrite=False):
     os.makedirs(dest_folder, exist_ok=True)
@@ -36,8 +36,13 @@ def extract_fonts_from_zip(zip_path, font_folder, prefer_ttf, include_web, allow
         license_files = []
         web_files = []
 
-        for root, _, files in os.walk(temp_dir):
+        for root, dirs, files in os.walk(temp_dir):
+            # Exclude __MACOSX folders
+            dirs[:] = [d for d in dirs if d != '__MACOSX']
             for file in files:
+                # Exclude files starting with ._
+                if file.startswith('._'):
+                    continue
                 full_path = os.path.join(root, file)
                 lower = file.lower()
                 if lower.endswith(('.ttf', '.otf')):
